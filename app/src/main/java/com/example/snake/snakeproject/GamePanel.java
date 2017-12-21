@@ -2,6 +2,9 @@ package com.example.snake.snakeproject;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -13,6 +16,9 @@ import android.view.SurfaceView;
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private MainThread thread;
 
+    private Player player;
+    private Point playerPosition;
+
     public GamePanel(Context context) {
         super(context);
 
@@ -20,6 +26,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
 
         thread = new MainThread(getHolder(), this);
+
+        player = new Player(new Rect(100, 100, 200, 200), Color.rgb(255,0,0));
+        playerPosition = new Point(150, 150);
 
         setFocusable(true);
     }
@@ -53,7 +62,13 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return super.onTouchEvent(event);
+        switch ( event.getAction() ) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_MOVE:
+                playerPosition.set( (int) event.getX(), (int) event.getY() );
+        }
+        return true;
+        //return super.onTouchEvent(event);
     }
 
     public void update() {
@@ -63,5 +78,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
+        canvas.drawColor(Color.WHITE);
+        player.draw(canvas);
     }
 }
