@@ -67,7 +67,7 @@ public class CellGrid implements GameObject {
                 if (cells[r][c] == 1)
                     paint.setColor(Color.WHITE);
                 else if (cells[r][c] == 2)
-                    paint.setColor(Color.RED);
+                    paint.setColor(Color.GREEN);
                 else
                     paint.setColor(Color.BLACK);
                 canvas.drawRect(rectangle, paint);

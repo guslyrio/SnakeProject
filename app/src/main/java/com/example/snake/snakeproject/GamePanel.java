@@ -33,7 +33,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     //Food
     private List<Food> foods = new ArrayList<Food>();
-    private int nFoods = 3;
+    private int nFoods = 10;
 
     private Point eventStarts;
     private Point eventEnds;
@@ -73,6 +73,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             else {
                 i--;
             }
+            i++;
         }
 
 
@@ -155,6 +156,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void update() {
+
     }
 
     @Override
