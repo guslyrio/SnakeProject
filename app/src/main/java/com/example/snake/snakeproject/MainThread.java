@@ -5,9 +5,6 @@ import android.view.SurfaceHolder;
 
 /**
  * Created by glyrio on 18/12/2017.
- *
- * based on: https://www.youtube.com/watch?v=OojQitoAEXs
- * https://www.youtube.com/watch?v=Rliwg0sELJo
  */
 
 
