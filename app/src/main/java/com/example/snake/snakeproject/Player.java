@@ -1,5 +1,6 @@
 package com.example.snake.snakeproject;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -38,6 +39,7 @@ public class Player implements GameObject {
     private int direction = 0;
     private boolean dead = false;
     private int score = 0;
+    private int totalScore = 0;
     private List<Part> body = new ArrayList<Part>();
     private CellGrid grid;
 
@@ -91,6 +93,7 @@ public class Player implements GameObject {
         // (snake size increases automatic as we added a new head)
         if (grid.hasFood(newHeadRow, newHeadCol)) {
             score++;
+            totalScore++;
         }
         //otherwise, remove its tail to keep snake size
         else {
@@ -103,8 +106,18 @@ public class Player implements GameObject {
         grid.occupyCell(newHeadRow, newHeadCol, 1);
     }
 
+    public boolean isDead() { return dead; }
+
     public int getScore() {
         return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public int getTotalScore() {
+        return totalScore;
     }
 
     @Override
@@ -117,7 +130,8 @@ public class Player implements GameObject {
 
     @Override
     public void update() {
-
+        if (!dead)
+            this.move();
     }
 
 }

@@ -1,9 +1,11 @@
 package com.example.snake.snakeproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.view.MotionEvent;
@@ -21,12 +23,16 @@ import java.util.Random;
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private MainThread thread;
 
+    //Game messages
+    private Rect r = new Rect();
+
     //Cell Grid dimensions;
     private int topGap = 50;
     private int nRows = 0;
     private int nCols = 40;
     private int cellSize = 0;
     private CellGrid cellGrid;
+    private long timeToRestart = 0;
 
     //Snake
     private Player player;
@@ -55,9 +61,30 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         cellGrid = new CellGrid(cellSize, nCols, nRows, topGap);
 
         //Player initialization on grid center.
+        initializePlayer();
+        //Random initialize food
+        initializeFood();
+
+        //event control
+        eventStarts = new Point(0, 0);
+        eventEnds = new Point(0, 0);
+
+        setFocusable(true);
+    }
+
+    private void initializeGrid() {
+        cellGrid = new CellGrid(cellSize, nCols, nRows, topGap);;
+    }
+
+    private void initializePlayer() {
         int startC = nCols/2;
         int startR = nRows/2;
         player = new Player(startC, startR, cellGrid);
+    }
+
+    private void initializeFood() {
+        foods = new ArrayList<Food>();
+        nFoods = 10;
 
         //Random food initialization
         Random random = new Random();
@@ -75,13 +102,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             }
             i++;
         }
-
-
-        //event control
-        eventStarts = new Point(0, 0);
-        eventEnds = new Point(0, 0);
-
-        setFocusable(true);
     }
 
     public static int getScreenWidth() {
@@ -122,6 +142,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int moveDirection = 0;
+
         switch ( event.getAction() ) {
             case MotionEvent.ACTION_DOWN:
                 eventStarts.set( (int) event.getX(), (int) event.getY() );
@@ -155,8 +176,46 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         //return super.onTouchEvent(event);
     }
 
-    public void update() {
+    public void restart() {
+        //grid initialization
+        initializeGrid();
 
+        //Player initialization on grid center.
+        initializePlayer();
+        //Random initialize food
+        initializeFood();
+
+        //event control
+        eventStarts = new Point(0, 0);
+        eventEnds = new Point(0, 0);
+    }
+
+    public void update() {
+        player.update();
+        if (player.getScore() >= nFoods) {
+            player.setScore(0);
+            //Random initialize food
+            initializeFood();
+        }
+        //save death time in timeToRestart
+        if (player.isDead() && (timeToRestart == 0)) {
+            timeToRestart = System.currentTimeMillis();
+            return;
+        }
+        //Check among of seconds passed from death time. If more then 2, restart.
+        if (player.isDead() && (System.currentTimeMillis() - timeToRestart >= 2000))
+            restart();
+    }
+
+    private void drawCenteredText(Canvas canvas, Paint paint, String text) {
+        canvas.getClipBounds(r);
+        int cHeight = r.height();
+        int cWidth = r.width();
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.getTextBounds(text, 0, text.length(), r);
+        float x = cWidth / 2f - r.width() / 2f - r.left;
+        float y = cHeight / 2f + r.height() / 2f - r.bottom;
+        canvas.drawText(text, x, y, paint);
     }
 
     @Override
@@ -164,6 +223,16 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         super.draw(canvas);
         canvas.drawColor(Color.BLACK);
         cellGrid.draw(canvas);
-        player.move();
+
+        Paint paint = new Paint();
+        paint.setTextSize(100);
+        paint.setColor(Color.MAGENTA);
+
+        //draw score
+        canvas.drawText("Score: " + player.getTotalScore(), 50, 100, paint);
+
+        if (player.isDead()) {
+            drawCenteredText(canvas, paint, "Game Over");
+        }
     }
 }
